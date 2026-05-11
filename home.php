@@ -175,16 +175,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cat-btn.active .ci{background:rgba(0,0,0,0.12);}
 
 .sidebar-footer{padding:13px 16px 18px;border-top:1px solid rgba(200,153,42,0.16);}
-.btn-add-side{
-    display:flex;align-items:center;justify-content:center;gap:7px;
+.btn-bumalik{
+    display:flex;align-items:center;justify-content:center;gap:8px;
     width:100%;padding:11px 14px;
-    background:linear-gradient(135deg,#c0392b,#96281b);
-    color:#fff;border:none;border-radius:var(--r-md);
-    font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
+    background:transparent;
+    color:rgba(245,234,214,0.80);
+    border:1.5px solid rgba(200,153,42,0.35);
+    border-radius:var(--r-md);
+    font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
     cursor:pointer;transition:all 0.25s var(--ease);
-    box-shadow:0 4px 18px rgba(192,57,43,0.38);
+    text-decoration:none;
+    letter-spacing:0.2px;
 }
-.btn-add-side:hover{background:linear-gradient(135deg,#a93226,#7b231a);transform:translateY(-2px);box-shadow:0 8px 26px rgba(192,57,43,0.48);}
+.btn-bumalik:hover{
+    background:rgba(200,153,42,0.14);
+    border-color:rgba(200,153,42,0.65);
+    color:#f5ead6;
+    transform:translateY(-2px);
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+}
 
 /* ──────────────────────────────────────────
    MAIN
@@ -556,9 +565,9 @@ if (isset($_GET['added'])): ?>
         <?php endforeach;?>
     </nav>
     <div class="sidebar-footer">
-        <button class="btn-add-side" onclick="openAddModal()">
-            <i class="fas fa-plus"></i> Magdagdag ng Ulam
-        </button>
+        <a href="index.php" class="btn-bumalik">
+            <i class="fas fa-arrow-left"></i> Bumalik sa Pahina
+        </a>
     </div>
 </aside>
 
