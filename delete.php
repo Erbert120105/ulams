@@ -3,21 +3,22 @@
 //  delete.php — Delete a Recipe
 //  Filipino Ulam Recipe System
 //
-//  Called by: home.php → confirmDelete() via window.location
-//  Usage:     delete.php?id=5
-//  After deletion → redirect to home.php?deleted=1
-//
-//  NOTE: home.php now handles deletion internally via ?delete=ID.
-//  This standalone file is kept for backward compatibility and
-//  direct-URL access (e.g. linked from old card buttons).
+//  Accepts:  ?id=5   OR   ?delete=5  (both work)
+//  Deletes the recipe record + its uploaded image file
+//  Redirects to home.php?deleted=1 on success
 // ============================================================
 
+ob_start(); // Buffer output so header() always works
 require_once 'db.php';
 
-// Only accept GET with a valid id
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+// Accept either ?id= or ?delete= parameter
+$id = 0;
+if (isset($_GET['id']))     $id = (int) $_GET['id'];
+if (isset($_GET['delete'])) $id = (int) $_GET['delete'];
 
+// Reject invalid id
 if ($id <= 0) {
+    ob_end_clean();
     header('Location: home.php');
     exit;
 }
@@ -25,15 +26,15 @@ if ($id <= 0) {
 $upload_dir = __DIR__ . '/uploads/';
 
 try {
-    // 1. Fetch the recipe's image filename before deleting
+    // 1. Fetch the image filename BEFORE deleting the record
     $stmt = $pdo->prepare("SELECT image FROM recipes WHERE id = ? LIMIT 1");
     $stmt->execute([$id]);
     $recipe = $stmt->fetch();
 
     if ($recipe) {
-        // 2. Delete the image file from disk (if it exists)
+        // 2. Delete the image file safely (basename prevents path traversal)
         if (!empty($recipe['image'])) {
-            $img_path = $upload_dir . $recipe['image'];
+            $img_path = $upload_dir . basename($recipe['image']);
             if (file_exists($img_path)) {
                 @unlink($img_path);
             }
@@ -43,11 +44,12 @@ try {
         $pdo->prepare("DELETE FROM recipes WHERE id = ?")->execute([$id]);
     }
 
+    ob_end_clean();
     header('Location: home.php?deleted=1');
     exit;
 
 } catch (\PDOException $e) {
-    // On DB error, redirect with error message
+    ob_end_clean();
     header('Location: home.php?delerror=' . urlencode($e->getMessage()));
     exit;
 }
