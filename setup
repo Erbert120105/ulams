@@ -1,0 +1,130 @@
+-- ============================================================
+--  setup.sql — Filipino Ulam Recipe System
+--  Run this entire script in: phpMyAdmin → SQL tab
+--  OR via command line: mysql -u root -p < setup.sql
+-- ============================================================
+
+-- Step 1: Create the database (safe to run multiple times)
+CREATE DATABASE IF NOT EXISTS ulam_recipes
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE ulam_recipes;
+
+-- Step 2: Drop and recreate the recipes table cleanly.
+--   This removes any wrongly-added UNIQUE constraints on
+--   name or category that may have been auto-generated.
+DROP TABLE IF EXISTS recipes;
+
+-- Step 3: Create table with NO unique constraints on
+--   name or category — multiple recipes per category allowed.
+--   Only id is unique (AUTO_INCREMENT PRIMARY KEY).
+CREATE TABLE recipes (
+    id              INT           NOT NULL AUTO_INCREMENT,
+    name            VARCHAR(100)  NOT NULL,
+    category        VARCHAR(50)   NOT NULL,
+    ingredients     TEXT          NOT NULL,
+    procedure_steps TEXT          NOT NULL,
+    image           VARCHAR(255)  DEFAULT NULL,
+    created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+    -- NO UNIQUE KEY on name
+    -- NO UNIQUE KEY on category
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+--  REPAIR ONLY (keep existing data, remove bad constraints):
+--  Run ONLY these two lines if you do NOT want to drop the table:
+-- ============================================================
+--  ALTER TABLE recipes DROP INDEX category;
+--  ALTER TABLE recipes DROP INDEX name;
+-- ============================================================
+
+
+-- ============================================================
+--  SAMPLE DATA — 2+ recipes per category to prove no UNIQUE
+--  constraint blocks multiple entries
+-- ============================================================
+INSERT INTO recipes (name, category, ingredients, procedure_steps, image) VALUES
+
+-- ── SABAW (2) ──
+('Sinigang na Baboy', 'Sabaw',
+'500g baboy (liempo)\n4 kamatis, hiniwa\n1 sibuyas, hiniwa\n2 labanos, hiniwa\n1 pakong (kangkong)\n3 gabi, balatan at hiniwa\n1 pakete sinigang mix\n1.5 litro tubig\nAsin at paminta ayon sa panlasa',
+'Pakuluin ang baboy sa tubig. Alisin ang bula.\nIlagay ang sibuyas at kamatis. Lutuin ng 20 minuto.\nIdagdag ang gabi hanggang malambot.\nIlagay ang labanos at sinigang mix. Haluin ng mabuti.\nTimplahan ng asin at paminta.\nIlagay ang kangkong. Patayin ang apoy. Ihain agad.',
+NULL),
+
+('Bulalo', 'Sabaw',
+'1 kilo beef shank (may buto)\n1 mais, hiniwa\n1 sibuyas\n6 butil ng bawang\n1 pechay Baguio\n2 patatas, hiniwa\nPatis at paminta ayon sa panlasa',
+'Pakuluin ang beef shank ng 10 minuto. Banlawan ng maigi.\nIbalik sa palayok kasama ang sibuyas, bawang, at sapat na tubig.\nLutuin ng 2-3 oras hanggang malambot ang karne.\nIdagdag ang mais at patatas. Lutuin ng 15 minuto.\nIlagay ang pechay. Timplahan ng patis at paminta.\nIhain agad habang mainit.',
+NULL),
+
+-- ── SARSADO (2) ──
+('Adobong Manok', 'Sarsado',
+'1 kilo manok, hiniwa\n1/2 tasang toyo\n1/2 tasang suka\n1 buong ulo ng bawang, durog\n2 kutsarang mantika\n3 dahon ng laurel\n1 kutsaritang pamintang buo\nTubig ayon sa panlasa',
+'Ibabad ang manok sa toyo, suka, bawang, at paminta ng 30 minuto.\nIgisa ang bawang sa mantika hanggang ginto ang kulay.\nIlagay ang manok. Lutuin hanggang maputi ang labas.\nIbuhos ang marinade at dagdag ng tubig.\nIlagay ang laurel. Pakuluin ng 5 minuto.\nBabain ang apoy at lutuin ng 25-30 minuto hanggang malambot.\nTimplahan at ihain kasama ang kanin.',
+NULL),
+
+('Kare-Kare', 'Sarsado',
+'1 kilo karne ng baka (o oxtail)\n1/2 kilo tripe (goto)\n1/2 tasang peanut butter\n1 platito ng mani, gilingin\n2 kutsarang atsuete (dissolved sa tubig)\n1 pechay Baguio\n1 talong, hiniwa\n1 sitaw, hiniwa\n1 saging na saba (banana blossom)\n1 sibuyas\n5 butil ng bawang\nBagoong alamang para sawsawan',
+'Pakuluin ang karne at tripe hanggang malambot (1.5-2 oras).\nIlabas ang karne. Igisa ang sibuyas at bawang sa mantika.\nIlagay ang karne at igisa ng ilang minuto.\nIbuhos ang sabaw ng karne.\nIdagdag ang atsuete water para sa kulay.\nIhalo ang peanut butter at ground mani. Lutuin ng 10 minuto.\nIlagay ang mga gulay. Lutuin hanggang malambot.\nTimplahan at ihain kasama ang bagoong alamang.',
+NULL),
+
+-- ── GINATAAN (2) ──
+('Ginataang Kalabasa at Sitaw', 'Ginataan',
+'1/4 kilo baboy, hiniwa nang maliit\n1/2 kalabasa, hiniwa\n1 tali ng sitaw, hiniwa\n2 tasang gata (coconut milk)\n1 tasang kakang gata\n3 butil ng bawang\n1 sibuyas\n2 siling pangsigang\nAsin at patis ayon sa panlasa',
+'Igisa ang bawang at sibuyas sa mantika.\nIlagay ang baboy at lutuin hanggang maputi.\nIbuhos ang 2 tasang gata. Haluin at pakuluin.\nIdagdag ang kalabasa. Lutuin ng 10 minuto hanggang malambot.\nIlagay ang sitaw at siling pangsigang.\nIbuhos ang kakang gata. Haluin nang dahan-dahan.\nTimplahan ng asin at patis. Lutuin ng 5 minuto pa. Ihain.',
+NULL),
+
+('Bicol Express', 'Ginataan',
+'500g baboy (liempo), hiniwa nang maliit\n2 tasang gata\n1 tasang kakang gata\n10 piraso ng siling pangsigang, hiniwa\n5 piraso ng siling labuyo, tinadtad\n3 butil ng bawang\n1 sibuyas\n2 kutsarang bagoong alamang\nAsin at paminta',
+'Igisa ang bawang at sibuyas sa mantika.\nIlagay ang baboy at lutuin hanggang medyo kayumanggi.\nIdagdag ang bagoong alamang. Lutuin ng 2 minuto.\nIbuhos ang gata. Pakuluin at bawasan ang apoy.\nIlagay ang lahat ng sili. Lutuin ng 15 minuto.\nIbuhos ang kakang gata. Haluin.\nTimplahan at lutuin hanggang lumapot ang sarsa. Ihain.',
+NULL),
+
+-- ── PRITO (2) ──
+('Crispy Pata', 'Prito',
+'1 buong pata ng baboy\n1 litro tubig\n1 buong ulo ng bawang\n2 kutsarang asin\n1 kutsaritang paminta\n3 dahon ng laurel\nMantika para sa pag-prito\nToyo, suka, sibuyas, siling labuyo para sawsawan',
+'Pakuluin ang pata kasama ang bawang, asin, paminta, at laurel ng 1.5 oras.\nIlabas at hayaang matuyo ng 2-3 oras (o magdamag sa ref).\nI-deep fry sa mainit na mantika sa katamtamang apoy.\nPritohin hanggang ginto at malutong sa lahat ng panig.\nIlabas at hayaang maubusan ng langis sa tissue.\nIhain kasama ang toyo-suka sawsawan.',
+NULL),
+
+('Pritong Isda', 'Prito',
+'2 piraso ng tilapia o bangus\n1 kutsarang asin\n1/2 kutsaritang paminta\n3 butil ng bawang, durog\nMantika para sa pag-prito\nSuka at siling labuyo para sawsawan',
+'Linisin ang isda at gawan ng hiwa-hiwa sa magkabilang panig.\nTimplahan ng asin, paminta, at durog na bawang.\nPahintulutang maging ang timpla ng 15 minuto.\nMagpainit ng mantika sa kawali sa katamtamang apoy.\nPritohin ang isda ng 5-7 minuto bawat panig hanggang ginto.\nIhain kasama ang kanin at sukang sawsawan.',
+NULL),
+
+-- ── INIHAW (2) ──
+('Inihaw na Liempo', 'Inihaw',
+'1 kilo liempo ng baboy\n1/2 tasang toyo\n1/4 tasang suka\n1 buong ulo ng bawang, durog\n2 kutsarang asukal\n1 kutsarang paminta\n1 kutsarang sprite o 7-up\nKalamansi para ihain',
+'Ihalo ang toyo, suka, bawang, asukal, paminta, at sprite.\nIbabad ang liempo sa marinade ng minimum 2 oras (mas maigi kung magdamag).\nMag-ihaw sa uling o grill sa katamtamang apoy.\nIbalikwas bawat 5-7 minuto. Pahiran ng marinade sa tuwing ibabalikwas.\nLutuin ng 25-30 minuto hanggang maluto at may kulay.\nIhain kasama ang patis, kalamansi, at kanin.',
+NULL),
+
+('Chicken Inasal', 'Inihaw',
+'1 kilo manok, hiniwa\n1/2 tasang suka\n1/4 tasang toyo\n1 buong ulo ng bawang, durog\n2 tangkay ng tanglad (lemongrass), pino na tinadtad\n1 kutsarang luya, kudkod\n2 kutsarang asukal\nAtsuete oil para pahiran\nAsin at paminta',
+'Ihalo ang suka, toyo, bawang, tanglad, luya, asukal, asin, at paminta.\nIbabad ang manok sa marinade ng 4 oras hanggang magdamag.\nMag-ihaw sa uling sa katamtamang apoy.\nIbalikwas at pahiran ng atsuete oil bawat 5 minuto.\nLutuin ng 30-35 minuto hanggang maluto ang loob.\nIhain kasama ang garlic rice at sukang sawsawan.',
+NULL),
+
+-- ── GULAY (2) ──
+('Pinakbet', 'Gulay',
+'1/4 kilo baboy, hiniwa\n2 talong, hiniwa\n2 ampalaya, hiniwa\n6 okra, hiniwa\n1 kalabasa, hiniwa\n1 sibuyas, hiniwa\n3 butil ng bawang\n2 kamatis\n3 kutsarang bagoong alamang\n1/2 tasang tubig\nMantika',
+'Igisa ang bawang, sibuyas, at kamatis sa mantika.\nIlagay ang baboy at lutuin hanggang maputi.\nIhalo ang bagoong alamang. Lutuin ng 2 minuto.\nIlagay ang kalabasa. Takpan. Lutuin ng 5 minuto.\nIdagdag ang talong, ampalaya, at okra.\nIbuhos ang tubig. Lutuin hanggang malambot ang gulay.\nHuwag haluin nang madalas para hindi masira. Ihain.',
+NULL),
+
+('Chopsuey', 'Gulay',
+'1/4 kilo hipon, alisan ng balat\n1/4 kilo atay ng manok, hiniwa\n1 repolyo, hiniwa\n1 cauliflower, hiniwa\n1 carrots, hiniwa\n1 sayote, hiniwa\n1 bell pepper, hiniwa\n2 butil ng bawang\n1 sibuyas\n2 kutsarang toyo\n1 tasang sabaw ng manok\nAsin, paminta, at cornstarch slurry',
+'Igisa ang bawang at sibuyas sa mantika.\nIlagay ang atay ng manok. Lutuin ng 5 minuto.\nIdagdag ang hipon. Lutuin hanggang mapula.\nIlagay ang mga gulay (simula sa pinakamatigas).\nIbuhos ang sabaw at toyo. Timplahan ng asin at paminta.\nIhalo ang cornstarch slurry para lumapot ang sarsa.\nIhain kasama ang kanin habang mainit.',
+NULL),
+
+-- ── SIZZLING (2) ──
+('Sizzling Sisig', 'Sizzling',
+'1/2 kilo maskara ng baboy (o liempo)\n1/2 kilo atay ng baboy\n2 sibuyas, tinadtad nang pino\n3 siling pangsigang, tinadtad\n3 siling labuyo, tinadtad\n3 kutsarang mayonesa\n2 kutsarang toyo\n1 kutsarang kalamansi juice\nAsin at paminta\n1 itlog (opsyonal)\nMantika',
+'Pakuluan ang maskara at atay hanggang malambot. Hayaang lumamig.\nTirang mabuti ang karne pagkatapos lumamig.\nI-grill o i-broil ang karne hanggang may kulay at char.\nTinadtad nang pino ang naihaw na karne.\nIgisa sa mantika. Idagdag ang sibuyas at sili.\nTimplahan ng toyo, kalamansi, asin, at paminta.\nIhalo ang mayonesa. Lutuin ng 3-5 minuto pa.\nIlagay sa mainit na plating (sizzling plate).\nLagyan ng itlog sa gitna kung gusto. Ihain agad!',
+NULL),
+
+('Sizzling Tofu', 'Sizzling',
+'2 bloke ng firm tofu, hiwa-hiwain\n1/4 kilo ground pork\n1 sibuyas, tinadtad\n3 butil ng bawang, tinadtad\n2 kutsarang toyo\n1 kutsarang oyster sauce\n1 kutsarang kalamansi juice\n2 siling labuyo, tinadtad\nAsin at paminta\nMantika para prito',
+'Pritohin ang tofu sa mantika hanggang ginto. Ilabas at itabi.\nSa parehong kawali, igisa ang bawang at sibuyas.\nIlagay ang ground pork. Lutuin hanggang kayumanggi.\nTimplahan ng toyo, oyster sauce, asin, at paminta.\nIlagay ang pritong tofu. Haluin nang maingat.\nIhalo ang kalamansi juice at siling labuyo.\nIlagay sa mainit na sizzling plate. Ihain agad.',
+NULL);
+
+-- ============================================================
+--  VERIFY: Run this to check all 14 sample recipes were inserted
+-- ============================================================
+-- SELECT id, name, category, created_at FROM recipes ORDER BY category, id;
